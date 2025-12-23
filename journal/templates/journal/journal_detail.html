@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}{{ journal.date }}のジャーナル{% endblock %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2>{{ journal.date }}のジャーナル詳細</h2>
+    <div class="mb-4">
+        <h3>Goals</h3>
+        {% if goals %}
+            {% for goal in goals %}
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <p class="card-text">{{ goal.title }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Goalはまだ設定されていません。</p>
+        {% endif %}
+    </div>
+    <div class="mb-4">
+        <h3>Todo</h3>
+        {% if todos %}
+            {% for todo in todos %}
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <p class="card-text">{{ todo.title }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Todoはまだ設定されていません。</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
