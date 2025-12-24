@@ -7,7 +7,7 @@ from .forms import GoalFormSet, TodoFormSet
 
 
 class HomeScreenView(TemplateView):
-    template_name = 'journal/index.html'
+    template_name = 'journal/home.html'
     
 # Journal関連のView
 class JournalDetailView(DetailView): # その日のGoalとTodoを表示するView
@@ -100,7 +100,7 @@ class CreateGoalView(CreateView):
     template_name = 'journal/create_goal.html'
     model = Goal
     fields = ('title',)
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('home')
     
     def form_valid(self, form):
         year = self.kwargs['year']
@@ -127,7 +127,7 @@ class UpdateGoalView(UpdateView):
 class DeleteGoalView(DeleteView):
     template_name = 'journal/delete_goal.html'
     model = Goal
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('home')
 
     def get_queryset(self):
         return Goal.objects.filter(journal__user=self.request.user)
@@ -138,7 +138,7 @@ class CreateTodoView(CreateView):
     template_name = 'journal/create_todo.html'
     model = Todo
     fields = ('title','start_time','end_time')
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('home')
 
     def form_valid(self, form):
         journal = Journal.objects.get(user=self.request.user, date=self.kwargs['date'])
@@ -156,7 +156,7 @@ class UpdateTodoView(UpdateView):
 class DeleteTodoView(DeleteView):
     template_name = 'journal/delete_todo.html'
     model = Todo
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('home')
 
     def get_queryset(self):
         return Todo.objects.filter(journal__user=self.request.user)

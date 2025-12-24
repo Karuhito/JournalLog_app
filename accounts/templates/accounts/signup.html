@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}新規登録{% endblock %}
+
+{% block content %}
+<div class="container mt-5 col-md-4 border border-4 p-4 rounded-3">
+    <div class="col-mb-6 p-4 rounded mt-5">
+        <h2 class="mb-4 text-center">新規登録</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="mb-3">
+                ユーザーネーム
+                {{ form.username }}
+            </div>
+            <div class="mb-3">
+                パスワード
+                {{ form.password1 }}
+            </div>
+            <div class="mb-3">
+                もう一度パスワードを入力してください
+                {{ form.password2 }}
+            </div>
+            <button type="submit" class="btn btn-primary w-100">登録</button>
+        </form>
+        <p class="mt-3 text-center">すでにアカウントをお持ちですか？
+            <a href="{% url 'accounts:login' %}">ログイン</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

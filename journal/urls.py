@@ -1,8 +1,10 @@
 from django.urls import path
 from . import views
 
+app_name = 'journal'
+
 urlpatterns = [
-    path('', views.HomeScreenView.as_view(), name='index'),
+    path('', views.HomeScreenView.as_view(), name='home'),
     path('journal/<int:year>/<int:month>/<int:day>/', views.JournalInitView.as_view(), name='journal_init'),
     path('journal/<int:year>/<int:month>/<int:day>', views.JournalDetailView.as_view(), name='journal_detail'),
     # todo関連のURLパターン
