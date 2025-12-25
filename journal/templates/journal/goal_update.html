@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Goal編集{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 600px;">
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            🎯 Goalの編集
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    {{ form.title.label_tag }}
+                    {{ form.title|add_class:"form-control" }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.detail.label_tag }}
+                    {{ form.detail|add_class:"form-control" }}
+                </div>
+
+                <div class="form-check mb-3">
+                    {{ form.is_done }}
+                    {{ form.is_done.label_tag }}
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'journal:journal_detail' year=form.instance.journal.date.year month=form.instance.journal.date.month day=form.instance.journal.date.day %}" class="btn btn-outline-secondary">
+                        キャンセル
+                    </a>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

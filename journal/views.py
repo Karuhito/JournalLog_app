@@ -157,7 +157,7 @@ class JournalInitView(CreateView):
 
 # Goal関連のView
 class CreateGoalView(CreateView):
-    template_name = 'journal/create_goal.html'
+    template_name = 'journal/goal_create.html'
     model = Goal
     fields = ('title',)
     success_url = reverse_lazy('journal:journal_detail', kwargs={
@@ -186,27 +186,46 @@ class CreateGoalView(CreateView):
         
 
 class UpdateGoalView(UpdateView):
-    template_name = 'journal/update_goal.html'
+    template_name = 'journal/goal_update.html'
     model = Goal
+    fields = ('title','is_done')
 
     def get_queryset(self):
+        # 自分のGoalかつJournalのユーザーも自分
         return Goal.objects.filter(journal__user=self.request.user)
+    
+    def get_success_url(self):
+        # 更新後はJournalDetailViewにリダイレクト
+        journal = self.object.journal
+        return reverse('journal:journal_detail', kwargs={
+            'year': journal.date.year,
+            'month': journal.date.month,
+            'day': journal.date.day,
+        })
 
 class DeleteGoalView(DeleteView):
-    template_name = 'journal/delete_goal.html'
+    template_name = 'journal/goal_delete.html'
     model = Goal
-    success_url = reverse_lazy('accounts:home')
+    success_url = reverse_lazy('journal:home')
 
     def get_queryset(self):
         return Goal.objects.filter(journal__user=self.request.user)
+    
+    def get_success_url(self):
+        journal = self.object.journal
+        return reverse('journal:journal_detail', kwargs={
+            'year': journal.date.year,
+            'month': journal.date.month,
+            'day': journal.date.day,
+        })
 
 
 # Todo関連のView
 class CreateTodoView(CreateView):
-    template_name = 'journal/create_todo.html'
+    template_name = 'journal/todo_create.html'
     model = Todo
     fields = ('title','start_time','end_time')
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('journal:home')
 
     def form_valid(self, form):
         journal_date = date(
@@ -233,7 +252,7 @@ class UpdateTodoView(UpdateView):
 class DeleteTodoView(DeleteView):
     template_name = 'journal/delete_todo.html'
     model = Todo
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('journal:home')
 
     def get_queryset(self):
         return Todo.objects.filter(journal__user=self.request.user)

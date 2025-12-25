@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Goal削除{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 600px;">
+
+    <div class="card shadow-sm border-danger">
+        <div class="card-header bg-danger text-white">
+            ⚠ Goal削除確認
+        </div>
+        <div class="card-body">
+            <p class="mb-3">このGoalを削除すると元に戻せません。よろしいですか？</p>
+            <ul class="list-group mb-3">
+                <li class="list-group-item">
+                    <strong>タイトル:</strong> {{ object.title }}
+                </li>
+                {% if object.detail %}
+                <li class="list-group-item">
+                    <strong>詳細:</strong> {{ object.detail }}
+                </li>
+                {% endif %}
+            </ul>
+
+            <form method="post" class="d-flex justify-content-between">
+                {% csrf_token %}
+                <a href="{% url 'journal:journal_detail' year=object.journal.date.year month=object.journal.date.month day=object.journal.date.day %}" class="btn btn-outline-secondary">
+                    キャンセル
+                </a>
+                <button type="submit" class="btn btn-danger">削除</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

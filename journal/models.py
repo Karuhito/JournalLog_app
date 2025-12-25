@@ -15,7 +15,6 @@ class Journal(models.Model):
 
 class Goal(models.Model):
     title = models.CharField(max_length=50)
-    detail = models.TextField(blank=True, null=True)
     is_done = models.BooleanField(default=False)
     journal = models.ForeignKey('Journal', on_delete=models.CASCADE)    
     created_at = models.DateTimeField(auto_now_add=True)
@@ -26,7 +25,6 @@ class Goal(models.Model):
 
 class Todo(models.Model):
     title = models.CharField(max_length=50)
-    detail = models.TextField(blank=True, null=True)
     start_time = models.TimeField()
     end_time = models.TimeField(blank=True, null=True)
     is_done = models.BooleanField(default=False)

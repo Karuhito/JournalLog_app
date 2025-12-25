@@ -13,18 +13,28 @@
         <!-- Goal 左半分 -->
         <div class="col-md-6">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     🎯 Goal
+                    <a href="{% url 'journal:create_goal' year=object.date.year month=object.date.month day=object.date.day %}"
+                       class="btn btn-sm btn-outline-light">
+                        + 追加
+                    </a>
                 </div>
                 <div class="card-body">
                     {% if goals %}
                         <ul class="list-group list-group-flush">
                             {% for goal in goals %}
-                                <li class="list-group-item">
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div>
                                     {{ goal.title }}
                                     {% if goal.detail %}<br><small class="text-muted">{{ goal.detail }}</small>{% endif %}
                                     {% if goal.is_done %}<span class="badge bg-success ms-2">達成</span>{% endif %}
-                                </li>
+                                </div>
+                                <div>
+                                    <a href="{% url 'journal:update_goal' goal.pk %}" class="btn btn-sm btn-outline-primary me-1">編集</a>
+                                    <a href="{% url 'journal:delete_goal' goal.pk %}" class="btn btn-sm btn-outline-danger">削除</a>
+                                </div>
+                            </li>
                             {% endfor %}
                         </ul>
                     {% else %}
@@ -37,18 +47,26 @@
         <!-- Todo 右半分 -->
         <div class="col-md-6">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-success text-white">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                     ✅ Todo
+                    <a href="{% url 'journal:create_todo' year=object.date.year month=object.date.month day=object.date.day %}"
+                    class="btn btn-sm btn-outline-light">
+                     + 追加
+                 </a>
                 </div>
                 <div class="card-body">
                     {% if todos %}
                         <ul class="list-group list-group-flush">
                             {% for todo in todos %}
-                                <li class="list-group-item">
-                                    {{ todo.title }}
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div>
+                                    <a href="{% url 'journal:update_todo' todo.pk %}" class="text-decoration-none">
+                                        {{ todo.title }}
+                                    </a>
                                     {% if todo.start_time %} <small>{{ todo.start_time|time:"H:i" }}{% if todo.end_time %} ~ {{ todo.end_time|time:"H:i" }}{% endif %}</small>{% endif %}
                                     {% if todo.is_done %}<span class="badge bg-success ms-2">完了</span>{% endif %}
-                                </li>
+                                </div>
+                            </li>
                             {% endfor %}
                         </ul>
                     {% else %}

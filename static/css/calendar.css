@@ -66,3 +66,9 @@
     padding: 15px;
     border-radius: 12px;
 }
+
+/* カードボディの最大高さとスクロール */
+.card-body {
+    max-height: 500px;
+    overflow-y: auto;
+}
