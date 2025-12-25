@@ -11,9 +11,7 @@ urlpatterns = [
     path('journal/<int:year>/<int:month>/<int:day>/todo/create/', views.CreateTodoView.as_view(), name='create_todo'),
     path('journal/todo/update/<int:pk>/', views.UpdateTodoView.as_view(), name='update_todo'),
     path('journal/todo/delete/<int:pk>/', views.DeleteTodoView.as_view(), name='delete_todo'),
-
-    # TodoDetailViewは未実装
-    #path('journal/todo/<int:pk>/', views.TodoDetailView.as_view(), name='todo_detail'),
+    path('journal/todo/<int:pk>/', views.DetailTodoView.as_view(), name='todo_detail'),
     
     # goal関連のURLパターン
     path('journal/<int:year>/<int:month>/<int:day>/goal/create/', views.CreateGoalView.as_view(), name='create_goal'),

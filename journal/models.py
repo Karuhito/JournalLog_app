@@ -25,7 +25,7 @@ class Goal(models.Model):
 
 class Todo(models.Model):
     title = models.CharField(max_length=50)
-    start_time = models.TimeField()
+    start_time = models.TimeField(blank=True, null=True)
     end_time = models.TimeField(blank=True, null=True)
     is_done = models.BooleanField(default=False)
     journal = models.ForeignKey('Journal', on_delete=models.CASCADE)

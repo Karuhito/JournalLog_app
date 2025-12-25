@@ -241,6 +241,20 @@ class CreateTodoView(CreateView):
         form.instance.journal = journal
         return super().form_valid(form)
 
+class DetailTodoView(DetailView):
+    template_name = 'journal/todo_detail.html'
+    model = Todo
+
+    def get_queryset(self):
+        return Todo.objects.filter(journal__user=self.request.user)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        todo = self.object
+        # 関連する Goal や他の Todo は必要に応じて追加可能
+        context['journal'] = todo.journal
+        return context
+
 class UpdateTodoView(UpdateView):
     template_name = 'journal/update_todo.html'
     model = Todo
