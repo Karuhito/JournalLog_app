@@ -16,15 +16,22 @@ def time_choices(interval=10):
 class GoalForm(forms.ModelForm):
     class Meta:
         model = Goal
-        fields = ['title',]
+        fields = ['title', 'is_done']
         labels = {
             'title': '目標タイトル',
-            'is_done': '達成/未達成',
+            'is_done': '達成 / 未達成',
         }
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'is_done': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        show_is_done = kwargs.pop('show_is_done', False)
+        super().__init__(*args, **kwargs)
+
+        if not show_is_done:
+            self.fields.pop('is_done')
 
 # Todoフォーム
 class TodoForm(forms.ModelForm):
@@ -43,7 +50,7 @@ class TodoForm(forms.ModelForm):
 
     class Meta:
         model = Todo
-        fields = ['title', 'start_time', 'end_time',]
+        fields = ['title', 'start_time', 'end_time','is_done']
         labels = {
             'title': 'Todo内容',
             'is_done': '完了/未完了',
@@ -56,7 +63,10 @@ class TodoForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        show_is_done = kwargs.pop('show_is_done', False)
         super().__init__(*args, **kwargs)
+        if not show_is_done:
+            self.fields.pop('is_done')
         self.fields['start_time'].required = False
         self.fields['end_time'].required = False
 

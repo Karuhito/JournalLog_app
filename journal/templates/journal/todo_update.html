@@ -35,10 +35,7 @@
                 </div>
 
                 <div class="d-flex justify-content-between">
-                    <a href="{% url 'journal:journal_detail'
-                        year=form.instance.journal.date.year
-                        month=form.instance.journal.date.month
-                        day=form.instance.journal.date.day %}"
+                    <a href="{% url 'journal:journal_detail' year=form.instance.journal.date.year month=form.instance.journal.date.month day=form.instance.journal.date.day %}"
                        class="btn btn-outline-secondary">
                         キャンセル
                     </a>

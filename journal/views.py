@@ -36,10 +36,10 @@ class HomeScreenView(LoginRequiredMixin, TemplateView):
             user=self.request.user,
             date__year=year,
             date__month=month
-        ).prefetch_related('goal_set', 'todo_set')
+        ).prefetch_related('goals', 'todos')
 
         journal_map = {
-            j.date: (j.goal_set.exists() or j.todo_set.exists())
+            j.date: (j.goals.exists() or j.todos.exists())
             for j in journals
         }
 
@@ -78,16 +78,16 @@ class JournalDetailView(DetailView): # その日のGoalとTodoを表示するVie
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         journal = self.object
-        context['goals'] = journal.goal_set.all()
-        context['todos'] = journal.todo_set.all()
+        context['goals'] = journal.goals.all()
+        context['todos'] = journal.todos.all()
         return context
     
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         journal = self.object
 
-        goals = journal.goal_set.all()
-        todos = journal.todo_set.all()
+        goals = journal.goals.all()
+        todos = journal.todos.all()
 
         if not goals.exists() and not todos.exists():
             return redirect(
@@ -108,12 +108,12 @@ class JournalInitView(CreateView):
             date=date(year, month, day)
         )
         goal_formset = GoalFormSet(
-            queryset=journal.goal_set.none(),
+            queryset=journal.goals.none(),
             prefix='goal'
         )
 
         todo_formset = TodoFormSet(
-            queryset=journal.todo_set.none(),
+            queryset=journal.todos.none(),
             prefix='todo'
         )
 
@@ -130,8 +130,8 @@ class JournalInitView(CreateView):
             date = date(year, month, day)
         )
 
-        goal_formset = GoalFormSet(request.POST, queryset=journal.goal_set.none(),prefix='goal')
-        todo_formset = TodoFormSet(request.POST, queryset=journal.todo_set.none(),prefix='todo')
+        goal_formset = GoalFormSet(request.POST, queryset=journal.goals.none(),prefix='goal')
+        todo_formset = TodoFormSet(request.POST, queryset=journal.todos.none(),prefix='todo')
 
         if goal_formset.is_valid() and todo_formset.is_valid():
             goal = goal_formset.save(commit=False)
@@ -163,19 +163,21 @@ class CreateGoalView(CreateView):
     form_class = GoalForm
     template_name = 'journal/goal_create.html'
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['show_is_done'] = False
+        return kwargs
+
     def form_valid(self, form):
         form.instance.is_done = False
         year = self.kwargs['year']
         month = self.kwargs['month']
         day = self.kwargs['day']
- 
-
-        journal_date = date(year, month, day)
 
         journal = get_object_or_404(
             Journal,
             user=self.request.user,
-            date=journal_date
+            date=date(year, month, day)
         )
 
         form.instance.journal = journal
@@ -187,7 +189,7 @@ class CreateGoalView(CreateView):
             month=month,
             day=day
         )
-    
+        
 # goalの完了・未完了切り替えView
 class ToggleGoalDoneView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -211,21 +213,23 @@ class ToggleGoalDoneView(LoginRequiredMixin, View):
 class UpdateGoalView(UpdateView):
     template_name = 'journal/goal_update.html'
     model = Goal
-    fields = ('title','is_done')
+    form_class = GoalForm
 
     def get_queryset(self):
-        # 自分のGoalかつJournalのユーザーも自分
         return Goal.objects.filter(journal__user=self.request.user)
-    
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['show_is_done'] = True
+        return kwargs
+
     def get_success_url(self):
-        # 更新後はJournalDetailViewにリダイレクト
         journal = self.object.journal
         return reverse('journal:journal_detail', kwargs={
             'year': journal.date.year,
             'month': journal.date.month,
             'day': journal.date.day,
         })
-
 class DeleteGoalView(DeleteView):
     template_name = 'journal/goal_delete.html'
     model = Goal
@@ -249,18 +253,21 @@ class CreateTodoView(CreateView):
     form_class = TodoForm
     template_name = 'journal/todo_create.html'
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['show_is_done'] = False  # ← ここが肝
+        return kwargs
+
     def form_valid(self, form):
         form.instance.is_done = False
         year = self.kwargs['year']
         month = self.kwargs['month']
         day = self.kwargs['day']
 
-        journal_date = date(year, month, day)
-
         journal = get_object_or_404(
             Journal,
             user=self.request.user,
-            date=journal_date
+            date=date(year, month, day)
         )
 
         form.instance.journal = journal
@@ -272,7 +279,7 @@ class CreateTodoView(CreateView):
             month=month,
             day=day
         )
-    
+
 # todo の完了・未完了切り替えView
 class ToggleTodoDoneView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -305,10 +312,15 @@ class DetailTodoView(DetailView):
 class UpdateTodoView(UpdateView):
     template_name = 'journal/todo_update.html'
     model = Todo
-    fields = ['title', 'start_time', 'end_time', 'is_done']
+    form_class = TodoForm  # ← fields を消す
 
     def get_queryset(self):
         return Todo.objects.filter(journal__user=self.request.user)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['show_is_done'] = True  # ← ここが肝
+        return kwargs
 
     def get_success_url(self):
         journal = self.object.journal

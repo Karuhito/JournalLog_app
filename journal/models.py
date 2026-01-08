@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import User
 from django.utils import timezone
 
 class Journal(models.Model):
@@ -10,13 +9,22 @@ class Journal(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'date'],
+                name='unique_journal_per_user_per_date'
+            )
+        ]
+        
+
     def __str__(self):
-        return F"{self.user.username} - {self.date}"
+        return f"{self.user.username} - {self.date}"
 
 class Goal(models.Model):
     title = models.CharField(max_length=50)
     is_done = models.BooleanField(default=False)
-    journal = models.ForeignKey('Journal', on_delete=models.CASCADE)    
+    journal = models.ForeignKey('Journal', on_delete=models.CASCADE, related_name='goals')    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -28,7 +36,7 @@ class Todo(models.Model):
     start_time = models.TimeField(blank=True, null=True)
     end_time = models.TimeField(blank=True, null=True)
     is_done = models.BooleanField(default=False)
-    journal = models.ForeignKey('Journal', on_delete=models.CASCADE)
+    journal = models.ForeignKey('Journal', on_delete=models.CASCADE, related_name='todos')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
