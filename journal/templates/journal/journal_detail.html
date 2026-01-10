@@ -1,99 +1,188 @@
 {% extends "base.html" %}
 {% block title %}Journal詳細{% endblock %}
 
+{% block action %}
+<!-- スマホサイズ用の横並びボタン -->
+<div class="d-flex d-md-none gap-2 flex-wrap mb-2">
+    <a class="btn btn-outline-primary btn-sm" href="#top">TOP</a>
+    <a class="btn btn-outline-primary btn-sm" href="#goal">Goal</a>
+    <a class="btn btn-outline-primary btn-sm" href="#todo">Todo</a>
+</div>
+{% endblock %}
+
 {% block content %}
-<div class="container my-5">
+<div class="container my-4" id="top">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>{{ object.date|date:"Y年n月j日" }}</h3>
-        <a href="{% url 'journal:home' %}" class="btn btn-outline-secondary">← カレンダーへ戻る</a>
+    <!-- ヘッダー -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">{{ object.date|date:"Y年n月j日" }}</h4>
+        <a href="{% url 'journal:home' %}" class="btn btn-outline-secondary btn-sm">
+            ← カレンダー
+        </a>
     </div>
 
-    <div class="row g-4">
-        <!-- Goal 左半分 -->
-        <div class="col-md-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    🎯 Goal
-                    <a href="{% url 'journal:create_goal' year=object.date.year month=object.date.month day=object.date.day %}"
-                       class="btn btn-sm btn-outline-light">
-                        + 追加
-                    </a>
+    <!-- ===================== -->
+    <!-- PC表示（従来レイアウト） -->
+    <!-- ===================== -->
+    <div class="d-none d-md-block">
+        <div class="row g-4">
+
+            <!-- Goal -->
+            <div class="col-md-6" id="goal">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        Goal
+                        <a href="{% url 'journal:create_goal' year=object.date.year month=object.date.month day=object.date.day %}"
+                           class="btn btn-sm btn-outline-light">
+                            + 追加
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% if goals %}
+                            <ul class="list-group list-group-flush">
+                                {% for goal in goals %}
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div>
+                                        {{ goal.title }}
+                                        {% if goal.is_done %}
+                                            <span class="badge bg-success ms-2">達成</span>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'journal:update_goal' goal.pk %}"
+                                           class="btn btn-sm btn-outline-primary me-1">編集</a>
+                                        <a href="{% url 'journal:delete_goal' goal.pk %}"
+                                           class="btn btn-sm btn-outline-danger">削除</a>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">今日のGoalはありません。</p>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="card-body">
-                    {% if goals %}
-                        <ul class="list-group list-group-flush">
-                            {% for goal in goals %}
-                            <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <div>
-                                    {{ goal.title }}
-                                    {% if goal.detail %}<br><small class="text-muted">{{ goal.detail }}</small>{% endif %}
-                                    {% if goal.is_done %}<span class="badge bg-success ms-2">達成</span>{% endif %}
-                                </div>
-                                <div>
-                                    <a href="{% url 'journal:update_goal' goal.pk %}" class="btn btn-sm btn-outline-primary me-1">編集</a>
-                                    <a href="{% url 'journal:delete_goal' goal.pk %}" class="btn btn-sm btn-outline-danger">削除</a>
-                                </div>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="text-muted">今日のGoalはありません。</p>
-                    {% endif %}
+            </div>
+
+            <!-- Todo -->
+            <div class="col-md-6" id="todo">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        Todo
+                        <a href="{% url 'journal:create_todo' year=object.date.year month=object.date.month day=object.date.day %}"
+                           class="btn btn-sm btn-outline-light">
+                            + 追加
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% if todos %}
+                            <ul class="list-group list-group-flush">
+                                {% for todo in todos %}
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div>
+                                        {{ todo.title }}
+                                        {% if todo.start_time %}
+                                            <br>
+                                            <small class="text-muted">
+                                                {{ todo.start_time|time:"H:i" }}
+                                                {% if todo.end_time %}~{{ todo.end_time|time:"H:i" }}{% endif %}
+                                            </small>
+                                        {% endif %}
+                                        {% if todo.is_done %}
+                                            <span class="badge bg-success ms-2">完了</span>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'journal:update_todo' todo.pk %}"
+                                           class="btn btn-sm btn-outline-success me-1">編集</a>
+                                        <a href="{% url 'journal:delete_todo' todo.pk %}"
+                                           class="btn btn-sm btn-outline-danger">削除</a>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">今日のTodoはありません。</p>
+                        {% endif %}
+                    </div>
                 </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===================== -->
+    <!-- スマホ表示（横並びボタンあり） -->
+    <!-- ===================== -->
+    <div class="d-md-none">
+
+        <!-- Goal -->
+        <div class="card shadow-sm mb-4" id="goal">
+            <div class="card-header bg-primary text-white">Goal</div>
+            <div class="card-body">
+                {% if goals %}
+                    {% for goal in goals %}
+                    <div class="border rounded p-3 mb-2">
+                        <div class="fw-bold">
+                            {{ goal.title }}
+                            {% if goal.is_done %}
+                                <span class="badge bg-success ms-2">達成</span>
+                            {% endif %}
+                        </div>
+                        <div class="mt-2 d-flex gap-2">
+                            <a href="{% url 'journal:update_goal' goal.pk %}"
+                               class="btn btn-sm btn-outline-primary w-50">編集</a>
+                            <a href="{% url 'journal:delete_goal' goal.pk %}"
+                               class="btn btn-sm btn-outline-danger w-50">削除</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted mb-0">今日のGoalはありません。</p>
+                {% endif %}
+
+                <a href="{% url 'journal:create_goal' year=object.date.year month=object.date.month day=object.date.day %}"
+                   class="btn btn-primary w-100 mt-3">+ Goalを追加</a>
             </div>
         </div>
 
-        <!-- Todo 右半分 -->
-        <div class="col-md-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                    ✅ Todo
-                    <a href="{% url 'journal:create_todo' year=object.date.year month=object.date.month day=object.date.day %}"
-                    class="btn btn-sm btn-outline-light">
-                     + 追加
-                 </a>
-                </div>
-                <div class="card-body">
-                    {% if todos %}
-                        <ul class="list-group list-group-flush">
-                            {% for todo in todos %}
-                            <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <!-- 左：内容 -->
-                                <div>
-                                    {{ todo.title }}
-                                    {% if todo.start_time %}
-                                        <br>
-                                        <small class="text-muted">
-                                            {{ todo.start_time|time:"H:i" }}
-                                            {% if todo.end_time %} ~ {{ todo.end_time|time:"H:i" }}{% endif %}
-                                        </small>
-                                    {% endif %}
-                                    {% if todo.is_done %}
-                                        <span class="badge bg-success ms-2">完了</span>
-                                    {% endif %}
-                                </div>
-                            
-                                <!-- 右：操作 -->
-                                <div>
-                                    <a href="{% url 'journal:update_todo' todo.pk %}"
-                                       class="btn btn-sm btn-outline-success me-1">
-                                        編集
-                                    </a>
-                                    <a href="{% url 'journal:delete_todo' todo.pk %}"
-                                       class="btn btn-sm btn-outline-danger">
-                                        削除
-                                    </a>
-                                </div>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="text-muted">今日のTodoはありません。</p>
-                    {% endif %}
-                </div>
+        <!-- Todo -->
+        <div class="card shadow-sm" id="todo">
+            <div class="card-header bg-success text-white">Todo</div>
+            <div class="card-body">
+                {% if todos %}
+                    {% for todo in todos %}
+                    <div class="border rounded p-3 mb-2">
+                        <div class="fw-bold">
+                            {{ todo.title }}
+                            {% if todo.is_done %}
+                                <span class="badge bg-success ms-2">完了</span>
+                            {% endif %}
+                        </div>
+                        {% if todo.start_time %}
+                            <small class="text-muted">
+                                {{ todo.start_time|time:"H:i" }}
+                                {% if todo.end_time %}~{{ todo.end_time|time:"H:i" }}{% endif %}
+                            </small>
+                        {% endif %}
+                        <div class="mt-2 d-flex gap-2">
+                            <a href="{% url 'journal:update_todo' todo.pk %}"
+                               class="btn btn-sm btn-outline-success w-50">編集</a>
+                            <a href="{% url 'journal:delete_todo' todo.pk %}"
+                               class="btn btn-sm btn-outline-danger w-50">削除</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted mb-0">今日のTodoはありません。</p>
+                {% endif %}
+
+                <a href="{% url 'journal:create_todo' year=object.date.year month=object.date.month day=object.date.day %}"
+                   class="btn btn-success w-100 mt-3">+ Todoを追加</a>
             </div>
         </div>
+
     </div>
+
 </div>
 {% endblock %}

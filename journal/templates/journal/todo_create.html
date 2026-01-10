@@ -8,44 +8,44 @@
 {% endblock %}
 
 {% block content %}
-<div class="container my-5" style="max-width: 600px;">
-
+<div class="container my-5 w-100" style="max-width: 600px;" id="todo">
     <h3 class="mb-4">Todoを追加</h3>
 
     <form method="post">
         {% csrf_token %}
-
         <div class="todo-form border rounded p-3 mb-3">
 
-            <div class="mb-2">
+            <div class="mb-3">
                 {{ form.title.label_tag }}
-                {{ form.title }}
+                {{ form.title|add_class:"form-control" }}
             </div>
 
-            <div class="row g-2">
+            <div class="row g-2 mb-3">
                 <div class="col-6">
                     {{ form.start_time.label_tag }}
-                    {{ form.start_time }}
+                    {{ form.start_time|add_class:"form-control" }}
                 </div>
                 <div class="col-6">
                     {{ form.end_time.label_tag }}
-                    {{ form.end_time }}
+                    {{ form.end_time|add_class:"form-control" }}
                 </div>
             </div>
 
-            <div class="form-check mt-3">
+            <div class="form-check mb-3">
                 {{ form.is_done }}
                 {{ form.is_done.label_tag }}
             </div>
-
         </div>
 
-        <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary px-5">
+        <div class="d-flex justify-content-between flex-wrap gap-2 mt-3">
+            <a href="{% url 'journal:journal_detail' year=form.instance.journal.date.year month=form.instance.journal.date.month day=form.instance.journal.date.day %}"
+               class="btn btn-outline-secondary w-100 w-sm-auto">
+                キャンセル
+            </a>
+            <button type="submit" class="btn btn-primary w-100 w-sm-auto">
                 保存
             </button>
         </div>
-
     </form>
 </div>
 {% endblock %}

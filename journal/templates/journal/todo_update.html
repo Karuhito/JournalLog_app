@@ -3,11 +3,11 @@
 {% block title %}Todo編集{% endblock %}
 
 {% block content %}
-<div class="container my-5" style="max-width: 600px;">
+<div class="container my-5 w-100" style="max-width: 600px;" id="todo">
 
     <div class="card shadow-sm">
         <div class="card-header bg-success text-white">
-            ✅ Todoの編集
+            Todoの編集
         </div>
         <div class="card-body">
             <form method="post">
@@ -19,11 +19,11 @@
                 </div>
 
                 <div class="row mb-3">
-                    <div class="col">
+                    <div class="col-6">
                         {{ form.start_time.label_tag }}
                         {{ form.start_time|add_class:"form-control" }}
                     </div>
-                    <div class="col">
+                    <div class="col-6">
                         {{ form.end_time.label_tag }}
                         {{ form.end_time|add_class:"form-control" }}
                     </div>
@@ -34,12 +34,12 @@
                     {{ form.is_done.label_tag }}
                 </div>
 
-                <div class="d-flex justify-content-between">
+                <div class="d-flex flex-wrap justify-content-between gap-2">
                     <a href="{% url 'journal:journal_detail' year=form.instance.journal.date.year month=form.instance.journal.date.month day=form.instance.journal.date.day %}"
-                       class="btn btn-outline-secondary">
+                       class="btn btn-outline-secondary w-100 w-sm-auto">
                         キャンセル
                     </a>
-                    <button type="submit" class="btn btn-success">
+                    <button type="submit" class="btn btn-success w-100 w-sm-auto">
                         保存
                     </button>
                 </div>

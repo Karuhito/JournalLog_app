@@ -2,8 +2,7 @@
 {% block title %}Todo削除{% endblock %}
 
 {% block content %}
-<div class="container my-5" style="max-width: 500px;">
-
+<div class="container my-5 w-100" style="max-width: 500px;" id="todo">
     <h4 class="mb-4 text-danger">このTodoを削除しますか？</h4>
 
     <div class="card p-3 mb-4">
@@ -17,15 +16,14 @@
 
     <form method="post">
         {% csrf_token %}
-        <div class="d-flex justify-content-between">
-            <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-secondary">
+        <div class="d-flex flex-wrap justify-content-between gap-2">
+            <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-secondary w-100 w-sm-auto">
                 キャンセル
             </a>
-            <button type="submit" class="btn btn-danger">
+            <button type="submit" class="btn btn-danger w-100 w-sm-auto">
                 削除する
             </button>
         </div>
     </form>
-
 </div>
 {% endblock %}
