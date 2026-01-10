@@ -11,57 +11,119 @@ from .forms import GoalFormSet, TodoFormSet, TodoForm, GoalForm
 
 # Home画面のView
 class HomeScreenView(LoginRequiredMixin, TemplateView):
-    template_name = 'journal/home.html'
-    login_url = 'accounts:login'
+    template_name = "journal/home.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         today = date.today()
-        year = int(self.request.GET.get('year', today.year))
-        month = int(self.request.GET.get('month', today.month))
+        view_mode = self.request.GET.get("view", "month")
 
-        # 年・月プルダウン用
-        context['years'] = [y for y in range(today.year - 2, today.year + 5)]
-        context['months'] = list(range(1, 13))
-        context['year'] = year
-        context['month'] = month
-        context['today'] = today
+        context["view_mode"] = view_mode
+        context["today"] = today
 
-        # カレンダー生成
-        cal = calendar.Calendar(firstweekday=6)  # 日曜始まり
-        month_days = cal.monthdatescalendar(year, month)  # 週ごとの日付リスト
+        # ======================
+        # 月表示
+        # ======================
+        if view_mode == "month":
+            year = int(self.request.GET.get("year", today.year))
+            month = int(self.request.GET.get("month", today.month))
 
-        # 日付ごとの Journal 存在フラグ
-        journals = Journal.objects.filter(
-            user=self.request.user,
-            date__year=year,
-            date__month=month
-        ).prefetch_related('goals', 'todos')
+            cal = calendar.Calendar(firstweekday=6)
+            month_days = cal.monthdatescalendar(year, month)
 
-        journal_map = {
-            j.date: (j.goals.exists() or j.todos.exists())
-            for j in journals
-        }
+            journals = (
+                Journal.objects
+                .filter(
+                    user=self.request.user,
+                    date__year=year,
+                    date__month=month
+                )
+                .prefetch_related("goals", "todos")
+            )
 
-        # カレンダーデータ構築
-        cal_data = []
-        for week in month_days:
+            journal_map = {
+                j.date: (j.goals.exists() or j.todos.exists())
+                for j in journals
+            }
+
+            cal_data = []
+            for week in month_days:
+                week_row = []
+                for day in week:
+                    has_journal = journal_map.get(day, False)
+                    week_row.append({
+                        "day": day,
+                        "is_today": day == today,
+                        "is_other_month": day.month != month,
+                        "has_journal": has_journal,
+                        "url": (
+                            f"/journal/{day.year}/{day.month}/{day.day}/"
+                            if has_journal
+                            else f"/journal/{day.year}/{day.month}/{day.day}/init/"
+                        ),
+                    })
+                cal_data.append(week_row)
+
+            context.update({
+                "year": year,
+                "month": month,
+                "years": [y for y in range(today.year - 2, today.year + 5)],
+                "months": list(range(1, 13)),
+                "cal_data": cal_data,
+            })
+
+        # ======================
+        # 週表示
+        # ======================
+        else:
+            week_start_str = self.request.GET.get("week_start")
+
+            if week_start_str:
+                week_start = date.fromisoformat(week_start_str)
+            else:
+                week_start = today - timedelta(days=today.weekday())
+
+            week_end = week_start + timedelta(days=6)
+
+            journals = (
+                Journal.objects
+                .filter(
+                    user=self.request.user,
+                    date__range=(week_start, week_end)
+                )
+                .prefetch_related("goals", "todos")
+            )
+
+            journal_map = {
+                j.date: (j.goals.exists() or j.todos.exists())
+                for j in journals
+            }
+
             week_data = []
-            for day in week:
+            for i in range(7):
+                day = week_start + timedelta(days=i)
                 has_journal = journal_map.get(day, False)
-                week_data.append({
-                    'day': day,
-                    'has_journal': has_journal,
-                    # URL: 投稿済みなら DetailView、未投稿なら InitView
-                    'url': (
-                        f"/journal/{day.year}/{day.month}/{day.day}/"
-                        if has_journal else
-                        f"/journal/{day.year}/{day.month}/{day.day}/init/"
-                    )
-                })
-            cal_data.append(week_data)
 
-        context['cal_data'] = cal_data
+                week_data.append({
+                    "day": day,
+                    "is_today": day == today,
+                    "has_journal": has_journal,
+                    "url": (
+                        f"/journal/{day.year}/{day.month}/{day.day}/"
+                        if has_journal
+                        else f"/journal/{day.year}/{day.month}/{day.day}/init/"
+                    ),
+                })
+
+            context.update({
+                "week_start": week_start,
+                "week_end": week_end,
+                "prev_week": week_start - timedelta(days=7),
+                "next_week": week_start + timedelta(days=7),
+                "week_data": week_data,
+            })
+
         return context
     
 # Journal関連のView

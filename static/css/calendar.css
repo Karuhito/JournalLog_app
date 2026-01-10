@@ -1,3 +1,10 @@
+@media (max-width: 768px) {
+    .calendar-cell {
+        height: 48px;
+        font-size: 0.9rem;
+    }
+}
+
 /* カレンダーセル全体 */
 .calendar-cell {
     height: 90px;
@@ -84,4 +91,13 @@
     color: white;
     border-radius: 10px;
     pointer-events: none;
+}
+
+/* 曜日色 */
+.weekday_sun {
+    color: #dc3545; /* Bootstrap danger (赤) */
+}
+
+.weekday_sat {
+    color: #0d6efd; /* Bootstrap primary (青) */
 }
