@@ -156,7 +156,7 @@ class JournalDetailView(DetailView): # その日のGoalとTodoを表示するVie
 
         if not goals.exists() and not todos.exists():
             return redirect(
-                'journal_init',
+                'journal:journal_init',
                 year=journal.date.year,
                 month=journal.date.month,
                 day=journal.date.day
@@ -165,14 +165,18 @@ class JournalDetailView(DetailView): # その日のGoalとTodoを表示するVie
         context = self.get_context_data()
         return self.render_to_response(context)
     
-class JournalInitView(LoginRequiredMixin, CreateView):
+from django.views import View
+
+class JournalInitView(LoginRequiredMixin, View):
     template_name = 'journal/journal_init.html'
     login_url = 'accounts:login'
+
     def get(self, request, year, month, day):
         journal, _ = Journal.objects.get_or_create(
             user=request.user,
             date=date(year, month, day)
         )
+
         goal_formset = GoalFormSet(
             queryset=journal.goals.none(),
             prefix='goal'
@@ -188,41 +192,56 @@ class JournalInitView(LoginRequiredMixin, CreateView):
             'todo_formset': todo_formset,
             'journal': journal,
         })
-    
+
     def post(self, request, year, month, day):
         journal = get_object_or_404(
             Journal,
-            user = request.user,
-            date = date(year, month, day)
+            user=request.user,
+            date=date(year, month, day)
         )
 
-        goal_formset = GoalFormSet(request.POST, queryset=journal.goals.none(),prefix='goal')
-        todo_formset = TodoFormSet(request.POST, queryset=journal.todos.none(),prefix='todo')
+        goal_formset = GoalFormSet(
+            request.POST,
+            queryset=journal.goals.none(),
+            prefix='goal'
+        )
+        todo_formset = TodoFormSet(
+            request.POST,
+            queryset=journal.todos.none(),
+            prefix='todo'
+        )
+
+        print("GOAL VALID:", goal_formset.is_valid())
+        print("TODO VALID:", todo_formset.is_valid())
 
         if goal_formset.is_valid() and todo_formset.is_valid():
-            goal = goal_formset.save(commit=False)
-            todo = todo_formset.save(commit=False)
+            goals = goal_formset.save(commit=False)
+            todos = todo_formset.save(commit=False)
 
-            for goal in goal:
-                if not goal.title:
-                    continue
-                goal.journal = journal
-                goal.save()
-            
-            for todo in todo:
-                if not todo.title:
-                    continue
-                todo.journal = journal
-                todo.save()
+            for goal in goals:
+                if goal.title:
+                    goal.journal = journal
+                    goal.save()
 
-            return redirect('journal:journal_detail', year=year, month=month, day=day)
-        
-        return render(request, self.template_name,{
+            for todo in todos:
+                if todo.title:
+                    todo.journal = journal
+                    todo.save()
+
+            print("=== REDIRECT ===")
+            return redirect(
+                'journal:journal_detail',
+                year=year,
+                month=month,
+                day=day
+            )
+
+        return render(request, self.template_name, {
             'goal_formset': goal_formset,
             'todo_formset': todo_formset,
             'journal': journal,
         })
-
+    
 # Goal関連のView
 class CreateGoalView(LoginRequiredMixin, View):
     template_name = 'journal/goal_create.html'

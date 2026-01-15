@@ -6,139 +6,145 @@
 <script src="{% static 'js/journal_init.js' %}"></script>
 {% endblock %}
 
-{% block action %}
-<!-- スマホ用横並びボタン -->
-<div class="d-flex d-md-none gap-2 flex-wrap mb-2">
-    <a class="btn btn-outline-primary btn-sm" href="#top">TOP</a>
-    <a class="btn btn-outline-primary btn-sm" href="#goal">Goal</a>
-    <a class="btn btn-outline-primary btn-sm" href="#todo">Todo</a>
-</div>
-{% endblock %}
-
 {% block content %}
 <div class="container my-5" style="max-width: 900px;" id="top">
 
-    <!-- ヘッダー（日付 + 戻る） -->
+    <!-- ヘッダー -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h3 class="mb-1">{{ journal.date|date:"Y年n月j日" }}</h3>
             <small class="text-muted">今日の記録を作成します</small>
         </div>
-        <a href="{% url 'journal:home' %}" class="btn btn-outline-secondary">← カレンダーへ戻る</a>
+        <a href="{% url 'journal:home' %}" class="btn btn-outline-secondary">
+            ← カレンダーへ戻る
+        </a>
     </div>
 
     <form method="post">
         {% csrf_token %}
+
         <div class="row g-4">
 
-            <!-- ===================== -->
-            <!-- Goal -->
-            <!-- ===================== -->
-            <div class="col-md-6" id="goal">
+            <!-- ================= Goal ================= -->
+            <div class="col-md-6">
                 <div class="card shadow-sm h-100">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        Goal
-                        <button type="button" class="btn btn-sm btn-light" id="add-goal">+ 追加</button>
+                    <div class="card-header bg-primary text-white d-flex justify-content-between">
+                        <span>Goal</span>
+                        <button type="button" id="add-goal" class="btn btn-sm btn-light">+ 追加</button>
                     </div>
+
                     <div class="card-body">
                         {{ goal_formset.management_form }}
 
-                        <!-- PC & 大画面 -->
-                        <div class="d-none d-md-block" id="goal-formset">
+                        <div id="goal-formset">
                             {% for form in goal_formset %}
                             <div class="goal-form border rounded p-3 mb-3">
-                                <div class="mb-2">{{ form.title }}</div>
-                                <button type="button" class="btn btn-sm btn-outline-danger remove-form">- 削除</button>
-                            </div>
-                            {% endfor %}
-                        </div>
+                                {{ form.DELETE }}
 
-                        <!-- スマホ表示 -->
-                        <div class="d-md-none" id="goal-formset-mobile">
-                            {% for form in goal_formset %}
-                            <div class="goal-form border rounded p-3 mb-2">
-                                <div class="mb-2">{{ form.title }}</div>
-                                <button type="button" class="btn btn-sm btn-outline-danger remove-form w-100">- 削除</button>
-                            </div>
-                            {% endfor %}
-                        </div>
-
-                        <small class="text-muted d-block mt-2">今日達成したい目標を書いてみましょう</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ===================== -->
-            <!-- Todo -->
-            <!-- ===================== -->
-            <div class="col-md-6" id="todo">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                        Todo
-                        <button type="button" class="btn btn-sm btn-light" id="add-todo">+ 追加</button>
-                    </div>
-                    <div class="card-body">
-                        {{ todo_formset.management_form }}
-
-                        <!-- PC & 大画面 -->
-                        <div class="d-none d-md-block" id="todo-formset">
-                            {% for form in todo_formset %}
-                            <div class="todo-form border rounded p-3 mb-3">
-                                <div class="mb-2">{{ form.title.label_tag }}(必須) {{ form.title }}</div>
-                                <div class="row g-2">
-                                    <div class="col-6">{{ form.start_time.label_tag }} {{ form.start_time }}</div>
-                                    <div class="col-6">{{ form.end_time.label_tag }} {{ form.end_time }}</div>
+                                <div class="mb-2">
+                                    {{ form.title }}
                                 </div>
-                                <button type="button" class="btn btn-sm btn-outline-danger mt-2 remove-form">- 削除</button>
+
+                                <button type="button"
+                                        class="btn btn-outline-danger remove-form w-100 w-md-auto">
+                                    - 削除
+                                </button>
                             </div>
                             {% endfor %}
                         </div>
 
-                        <!-- スマホ表示 -->
-                        <div class="d-md-none" id="todo-formset-mobile">
-                            {% for form in todo_formset %}
-                            <div class="todo-form border rounded p-3 mb-2">
-                                <div class="mb-2">{{ form.title.label_tag }} {{ form.title }}</div>
-                                <div class="row g-2">
-                                    <div class="col-6">{{ form.start_time.label_tag }} {{ form.start_time }}</div>
-                                    <div class="col-6">{{ form.end_time.label_tag }} {{ form.end_time }}</div>
-                                </div>
-                                <button type="button" class="btn btn-sm btn-outline-danger w-100 mt-2 remove-form">- 削除</button>
-                            </div>
-                            {% endfor %}
-                        </div>
-
-                        <small class="text-muted d-block mt-2">
-                            開始時刻を選択すると終了時刻も自動で同期されます。終了時刻は開始時刻以前を選べません。
+                        <small class="text-muted">
+                            今日達成したい目標を書いてみましょう
                         </small>
                     </div>
                 </div>
             </div>
 
+            <!-- ================= Todo ================= -->
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-success text-white d-flex justify-content-between">
+                        <span>Todo</span>
+                        <button type="button" id="add-todo" class="btn btn-sm btn-light">+ 追加</button>
+                    </div>
+
+                    <div class="card-body">
+                        {{ todo_formset.management_form }}
+
+                        <div id="todo-formset">
+                            {% for form in todo_formset %}
+                            <div class="todo-form border rounded p-3 mb-3">
+                                {{ form.DELETE }}
+
+                                <div class="mb-2">
+                                    {{ form.title.label_tag }} {{ form.title }}
+                                </div>
+
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        {{ form.start_time.label_tag }} {{ form.start_time }}
+                                    </div>
+                                    <div class="col-6">
+                                        {{ form.end_time.label_tag }} {{ form.end_time }}
+                                    </div>
+                                </div>
+
+                                <button type="button"
+                                        class="btn btn-outline-danger mt-2 remove-form w-100 w-md-auto">
+                                    - 削除
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <small class="text-muted">
+                            開始時刻に応じて終了時刻を制限します
+                        </small>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- 空フォーム（非表示） -->
+        <!-- empty forms -->
         <div id="goal-empty-form" class="d-none">
             <div class="goal-form border rounded p-3 mb-3">
+                {{ goal_formset.empty_form.DELETE }}
                 <div class="mb-2">{{ goal_formset.empty_form.title }}</div>
-                <button type="button" class="btn btn-sm btn-outline-danger remove-form">- 削除</button>
+                <button type="button"
+                        class="btn btn-outline-danger remove-form w-100 w-md-auto">
+                    - 削除
+                </button>
             </div>
         </div>
 
         <div id="todo-empty-form" class="d-none">
             <div class="todo-form border rounded p-3 mb-3">
-                <div class="mb-2">{{ todo_formset.empty_form.title }}</div>
-                <div class="row g-2">
-                    <div class="col-6">{{ todo_formset.empty_form.start_time.label_tag }} {{ todo_formset.empty_form.start_time }}</div>
-                    <div class="col-6">{{ todo_formset.empty_form.end_time.label_tag }} {{ todo_formset.empty_form.end_time }}</div>
+                {{ todo_formset.empty_form.DELETE }}
+
+                <div class="mb-2">
+                    {{ todo_formset.empty_form.title }}
                 </div>
-                <button type="button" class="btn btn-sm btn-outline-danger mt-2 remove-form">- 削除</button>
+
+                <div class="row g-2">
+                    <div class="col-6">
+                        {{ todo_formset.empty_form.start_time }}
+                    </div>
+                    <div class="col-6">
+                        {{ todo_formset.empty_form.end_time }}
+                    </div>
+                </div>
+
+                <button type="button"
+                        class="btn btn-outline-danger mt-2 remove-form w-100 w-md-auto">
+                    - 削除
+                </button>
             </div>
         </div>
 
-        <!-- 保存ボタン -->
         <div class="text-center mt-5">
-            <button type="submit" class="btn btn-lg btn-primary px-5">保存する</button>
+            <button type="submit" class="btn btn-lg btn-primary px-5">
+                保存する
+            </button>
         </div>
     </form>
 </div>

@@ -1,69 +1,64 @@
-console.log("journal.js loaded");
+console.log("journal_init.js loaded");
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // フォームセットの追加/削除
-    function setupFormset({ addBtnId, formsetId, emptyFormId, totalFormsId, formClass }) {
+    function setupFormset({ addBtnId, formsetId, emptyFormId }) {
         const addBtn = document.getElementById(addBtnId);
         const formset = document.getElementById(formsetId);
-        const emptyFormTemplate = document.getElementById(emptyFormId).innerHTML;
-        const totalForms = document.getElementById(totalFormsId);
+        const emptyTemplate = document.getElementById(emptyFormId).innerHTML;
 
         addBtn.addEventListener('click', () => {
-            let formCount = parseInt(totalForms.value);
-            let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formCount);
+            const totalFormsInput =
+                formset.closest('.card-body')
+                    .querySelector('input[name$="-TOTAL_FORMS"]');
+
+            const index = parseInt(totalFormsInput.value);
+            const newFormHtml = emptyTemplate.replace(/__prefix__/g, index);
+
             formset.insertAdjacentHTML('beforeend', newFormHtml);
-            totalForms.value = formCount + 1;
+            totalFormsInput.value = index + 1;
         });
 
         formset.addEventListener('click', (e) => {
-            if (e.target.classList.contains('remove-form')) {
-                e.target.closest(formClass).remove();
-                totalForms.value = parseInt(totalForms.value) - 1;
+            if (!e.target.classList.contains('remove-form')) return;
+
+            const form = e.target.closest('.goal-form, .todo-form');
+            const deleteInput = form.querySelector('input[type="checkbox"][name$="-DELETE"]');
+
+            if (deleteInput) {
+                deleteInput.checked = true;
             }
+            form.style.display = 'none';
         });
     }
 
     setupFormset({
         addBtnId: 'add-goal',
         formsetId: 'goal-formset',
-        emptyFormId: 'goal-empty-form',
-        totalFormsId: 'id_goal-TOTAL_FORMS',
-        formClass: '.goal-form'
+        emptyFormId: 'goal-empty-form'
     });
 
     setupFormset({
         addBtnId: 'add-todo',
         formsetId: 'todo-formset',
-        emptyFormId: 'todo-empty-form',
-        totalFormsId: 'id_todo-TOTAL_FORMS',
-        formClass: '.todo-form'
+        emptyFormId: 'todo-empty-form'
     });
 
-    // 開始時刻と終了時刻の同期 + 終了時刻制限
-    function syncEndTimeWithLimit(startSelector, endSelector) {
-        document.addEventListener('input', (e) => {
-            if (!e.target.matches(startSelector)) return;
+    // 開始時刻 → 終了時刻制御
+    document.addEventListener('change', (e) => {
+        if (!e.target.name.endsWith('start_time')) return;
 
-            const formGroup = e.target.closest('.todo-form');
-            if (!formGroup) return;
+        const form = e.target.closest('.todo-form');
+        const endSelect = form.querySelector('select[name$="end_time"]');
 
-            const startValue = e.target.value;
-            const endSelect = formGroup.querySelector(endSelector);
-            if (!endSelect) return;
+        const startValue = e.target.value;
+        if (!endSelect.value) {
+            endSelect.value = startValue;
+        }
 
-            // 終了時刻が空欄なら開始時刻で自動セット
-            if (!endSelect.value) {
-                endSelect.value = startValue;
-            }
-
-            // 終了時刻の選択肢を制限（開始時刻以前は選べない）
-            Array.from(endSelect.options).forEach(option => {
-                if(option.value === "") return; // 空欄は無効にしない
-                option.disabled = option.value < startValue;
-            });
+        Array.from(endSelect.options).forEach(opt => {
+            if (!opt.value) return;
+            opt.disabled = opt.value < startValue;
         });
-    }
-
-    syncEndTimeWithLimit('select[name$="start_time"]', 'select[name$="end_time"]');
+    });
 });

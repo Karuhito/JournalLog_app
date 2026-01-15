@@ -83,5 +83,16 @@ class TodoForm(forms.ModelForm):
         return data
 
 # フォームセット
-GoalFormSet = modelformset_factory(Goal, form=GoalForm, extra=1, can_delete=False)
-TodoFormSet = modelformset_factory(Todo, form=TodoForm, extra=1, can_delete=False)
+GoalFormSet = modelformset_factory(
+    Goal,
+    form=GoalForm,
+    extra=1,
+    can_delete=False
+    )
+
+TodoFormSet = modelformset_factory(
+    Todo,
+    form=TodoForm,
+    extra=1,
+    can_delete=False
+    )
