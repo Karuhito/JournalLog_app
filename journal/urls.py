@@ -24,4 +24,9 @@ urlpatterns = [
     path('journal/<int:year>/<int:month>/<int:day>/schedule/create/', views.CreateScheduleView.as_view(), name='create_schedule'),
     path('journal/schedule/update/<int:pk>/', views.UpdateScheduleView.as_view(), name='update_schedule'),
     path('journal/schedule/delete/<int:pk>/', views.DeleteScheduleView.as_view(), name='delete_schedule'),
+
+    # Reflection関連のURLパターン (URLだけ)
+    # path('journal/<int:year>/<int:month>/<int:day>/reflection/create', views.CreateReflectionView.as_view(), name='create_reflection'),
+    # path('journal/reflection/update/<int:pk>', views.UpdateReflectionView.as_view(), name='update_reflection'),
+    # path('journal/reflection/delete/<int:pk>', views.DeleteReflectionView.as_view(), name='delete_reflection'),
 ]

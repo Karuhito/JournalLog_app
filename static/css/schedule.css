@@ -1,0 +1,10 @@
+.time-select {
+    max-height: 240px;   /* 表示される高さ */
+    overflow-y: auto;   /* スクロール */
+}
+
+@media (max-width: 768px) {
+    .time-select {
+        max-height: 180px;
+    }
+}

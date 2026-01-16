@@ -7,7 +7,7 @@ from django.http import HttpResponseForbidden
 from .models import Journal, Todo, Goal, Schedule
 from datetime import date, datetime, timedelta
 import calendar
-from .forms import GoalFormSet, TodoFormSet,  GoalForm, TodoForm, ScheduleFormSet
+from .forms import GoalFormSet, TodoFormSet, ScheduleFormSet,  GoalForm, TodoForm, ScheduleForm
 from django.http import Http404
 
 # Home画面のView
@@ -498,7 +498,18 @@ class CreateScheduleView(LoginRequiredMixin, View):
 class UpdateScheduleView(LoginRequiredMixin, UpdateView):
     template_name = "journal/schedule_update.html"
     model = Schedule
+    form_class = ScheduleForm
 
+    def get_queryset(self):
+        return Schedule.objects.filter(journal__user=self.request.user)
+    
+    def get_success_url(self):
+        journal = self.object.journal
+        return reverse('journal:journal_detail', kwargs={
+            'year': journal.date.year,
+            'month': journal.date.month,
+            'day': journal.date.day
+        })
 
 
 # スケジュール削除

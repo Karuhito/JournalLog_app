@@ -5,18 +5,19 @@ from django.forms import modelformset_factory
 
 # 時間の選択肢を10分刻みで生成（valueも文字列）
 def time_choices(interval=15):
-    choices = [('', '---')]
+    choices = []
     for hour in range(0, 24):
         for minute in range(0, 60, interval):
+            time_obj = datetime.time(hour, minute)
             label = f"{hour:02d}:{minute:02d}"
-            choices.append((label, label))  # value と label を文字列に統一
+            choices.append((time_obj, label))
     return choices
 
 # Goalフォーム
 class GoalForm(forms.ModelForm):
     class Meta:
         model = Goal
-        fields = ['title', ]
+        fields = ['title']
         labels = {
             'title': '目標タイトル',
         }
@@ -50,21 +51,25 @@ class TodoForm(forms.ModelForm):
 class ScheduleForm(forms.ModelForm):
     class Meta:
         model = Schedule
-        fields = ["title", "start_time", "end_time"]
+        fields = ['title', 'start_time', 'end_time',]
         widgets = {
-            "title": forms.TextInput(attrs={
-                "class": "form-control",
-                "placeholder": "予定内容"
+            'title': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '予定内容'
             }),
-            "start_time": forms.TimeInput(attrs={
-                "type": "time",
-                "class": "form-control"
+            'start_time': forms.Select(
+                choices=time_choices(15),
+                attrs={
+                'class': "form-select time-select"
             }),
-            "end_time": forms.TimeInput(attrs={
-                "type": "time",
-                "class": "form-control"
+            "end_time": forms.Select(
+                choices=time_choices(15),                
+                attrs={  
+                'class': "form-select time-select"
             }),
         }
+
+
 
 # フォームセット
 GoalFormSet = modelformset_factory(
