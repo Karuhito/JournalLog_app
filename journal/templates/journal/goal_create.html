@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block title %}Goal追加{% endblock %}
 
 {% block extra_js %}
@@ -7,43 +8,100 @@
 {% endblock %}
 
 {% block content %}
-<div class="container my-5" style="max-width: 600px;">
+<div class="container my-5" style="max-width: 900px;" id="top">
 
-    <h3 class="mb-4">Goalを追加</h3>
+    <!-- ヘッダー -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="mb-1">{{ journal.date|date:"Y年n月j日" }}</h3>
+            <small class="text-muted">この日のGoalを作成します</small>
+        </div>
+        <a href="{% url 'journal:journal_detail'
+            year=journal.date.year
+            month=journal.date.month
+            day=journal.date.day %}
+        " class="btn btn-outline-secondary">
+            ← 戻る
+        </a>
+    </div>
 
     <form method="post">
         {% csrf_token %}
+
+        <!-- management form -->
         {{ formset.management_form }}
 
-        <div id="goal-formset">
-            {% for form in formset %}
-            <div class="goal-form border rounded p-3 mb-3 position-relative">
-                <!-- 削除ボタンをフォーム上部に移動 -->
-                <div class="d-flex justify-content-end mb-2">
-                    <button type="button" class="btn btn-sm btn-outline-danger remove-form">削除</button>
-                </div>
-
-                <div class="mb-2">
-                    {{ form.title.label_tag }}
-                    {{ form.title }}
-                </div>
-
-                {% if form.is_done %}
-                <div class="form-check mt-2">
-                    {{ form.is_done }} {{ form.is_done.label_tag }}
-                </div>
-                {% endif %}
+        <!-- ===================== -->
+        <!-- Goal Formset -->
+        <!-- ===================== -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                Goal
+                <button type="button"
+                        class="btn btn-sm btn-light"
+                        id="add-goal">
+                    追加
+                </button>
             </div>
-            {% endfor %}
+
+            <div class="card-body" id="goal-formset">
+                {% for form in formset %}
+                <div class="goal-form border rounded p-3 mb-3">
+
+                    <div class="row g-2 align-items-end">
+                        <div class="col-12 col-md-10">
+                            {{ form.title.label_tag }}
+                            {{ form.title }}
+                        </div>
+
+                        <div class="col-12 col-md-2 d-grid">
+                            <button type="button"
+                                    class="btn btn-outline-danger remove-form">
+                                削除
+                            </button>
+                        </div>
+                    </div>
+
+                    {% if form.is_done %}
+                    <div class="form-check mt-2">
+                        {{ form.is_done }}
+                        {{ form.is_done.label_tag }}
+                    </div>
+                    {% endif %}
+
+                </div>
+                {% endfor %}
+            </div>
         </div>
 
-        <!-- 追加ボタンはフォームセット下に固定 -->
-        <div class="text-center my-3">
-            <button type="button" class="btn btn-outline-primary" id="add-goal">+ Goalを追加</button>
+        <!-- ===================== -->
+        <!-- Empty form（JS用） -->
+        <!-- ===================== -->
+        <div id="goal-empty-form" class="d-none">
+            <div class="goal-form border rounded p-3 mb-3">
+
+                <div class="row g-2 align-items-end">
+                    <div class="col-12 col-md-10">
+                        {{ formset.empty_form.title.label_tag }}
+                        {{ formset.empty_form.title }}
+                    </div>
+
+                    <div class="col-12 col-md-2 d-grid">
+                        <button type="button"
+                                class="btn btn-outline-danger remove-form">
+                            削除
+                        </button>
+                    </div>
+                </div>
+
+            </div>
         </div>
 
-        <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary px-5">保存</button>
+        <!-- 保存 -->
+        <div class="text-center mt-5">
+            <button type="submit" class="btn btn-lg btn-primary px-5">
+                保存する
+            </button>
         </div>
     </form>
 </div>

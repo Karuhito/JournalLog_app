@@ -304,11 +304,6 @@ class UpdateGoalView(LoginRequiredMixin, UpdateView):
     def get_queryset(self):
         return Goal.objects.filter(journal__user=self.request.user)
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['show_is_done'] = True
-        return kwargs
-
     def get_success_url(self):
         journal = self.object.journal
         return reverse('journal:journal_detail', kwargs={

@@ -1,48 +1,10 @@
-{% extends "base.html" %}
-{% load widget_tweaks %}
-{% block title %}Goal編集{% endblock %}
+{% extends "journal/common/update_base.html" %}
 
-{% block content %}
-<div class="container my-5" style="max-width: 600px;">
-
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            Goalの編集
-        </div>
-        <div class="card-body">
-            <form method="post">
-                {% csrf_token %}
-                
-                <div class="mb-3">
-                    {{ form.title.label_tag }}
-                    {{ form.title|add_class:"form-control" }}
-                </div>
-
-                {% if form.detail %}
-                <div class="mb-3">
-                    {{ form.detail.label_tag }}
-                    {{ form.detail|add_class:"form-control" }}
-                </div>
-                {% endif %}
-
-                {% if form.is_done %}
-                <div class="form-check mb-3">
-                    {{ form.is_done }}
-                    {{ form.is_done.label_tag }}
-                </div>
-                {% endif %}
-
-                <div class="d-flex flex-column flex-sm-row gap-2">
-                    <a href="{% url 'journal:journal_detail' year=form.instance.journal.date.year month=form.instance.journal.date.month day=form.instance.journal.date.day %}"
-                       class="btn btn-outline-secondary w-100 w-sm-auto">
-                        キャンセル
-                    </a>
-                    <button type="submit" class="btn btn-primary w-100 w-sm-auto">
-                        保存
-                    </button>
-                </div>
-            </form>
-        </div>
+{% block form_fields %}
+    {{ form.non_field_errors }}
+    <div class="mb-3">
+        {{ form.title.label_tag }}
+        {{ form.title }}
+        {{ form.title.errors }}
     </div>
-</div>
 {% endblock %}

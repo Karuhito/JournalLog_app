@@ -77,7 +77,7 @@
                             </div>
                             <div class="mt-2 d-flex gap-2 flex-wrap">
                                 <a href="{% url 'journal:update_todo' todo.pk %}"
-                                   class="btn btn-sm btn-outline-success w-50 w-md-auto">編集</a>
+                                   class="btn btn-sm btn-outline-info w-50 w-md-auto">編集</a>
                                 <a href="{% url 'journal:delete_todo' todo.pk %}"
                                    class="btn btn-sm btn-outline-danger w-50 w-md-auto">削除</a>
                             </div>
@@ -106,7 +106,7 @@
                             <small class="text-muted">{{ schedule.start_time|time:"H:i" }} 〜 {{ schedule.end_time|time:"H:i" }}</small>
                             <div class="mt-2 d-flex gap-2 flex-wrap">
                                 <a href="{% url 'journal:update_schedule' schedule.pk %}"
-                                   class="btn btn-sm btn-outline-secondary w-50 w-md-auto">編集</a>
+                                   class="btn btn-sm btn-outline-success w-50 w-md-auto">編集</a>
                                 <a href="{% url 'journal:delete_schedule' schedule.pk %}"
                                    class="btn btn-sm btn-outline-danger w-50 w-md-auto">削除</a>
                             </div>
